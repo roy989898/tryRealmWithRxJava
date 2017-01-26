@@ -12,6 +12,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.realm.Realm;
+import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 import pom.realmwithrxhava.Models.User;
 
@@ -28,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.tv_latest)
     TextView tvLatest;
     private Realm realm;
+    private RealmResults<User> result;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,17 +79,28 @@ public class MainActivity extends AppCompatActivity {
                 });
                 break;
             case R.id.bt_latest:
-                User user = getLatestUser();
-                tvLatest.setText(user.getName() + " " + user.getAge());
-
+                getLatestUser();
 
                 break;
         }
     }
 
-    private User getLatestUser() {
-        RealmResults<User> result = realm.where(User.class).findAll();
-        return result.get(result.size() - 1);
+    private void getLatestUser() {
+        result = realm.where(User.class).findAll();
+        useResultToSetTheUi(result);
 
+        result.addChangeListener(new RealmChangeListener<RealmResults<User>>() {
+            @Override
+            public void onChange(RealmResults<User> element) {
+                useResultToSetTheUi(element);
+            }
+        });
+
+
+    }
+
+    private void useResultToSetTheUi(RealmResults<User> result) {
+        User user = result.get(result.size() - 1);
+        tvLatest.setText(user.getName() + " " + user.getAge());
     }
 }
