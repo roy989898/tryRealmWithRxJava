@@ -9,7 +9,7 @@ import io.realm.annotations.Ignore;
 
 public class User extends RealmObject {
     private String name;
-    private int age;
+    private String age;
 
     @Ignore
     private int sessionId;
@@ -22,11 +22,11 @@ public class User extends RealmObject {
         this.name = name;
     }
 
-    public int getAge() {
+    public String getAge() {
         return age;
     }
 
-    public void setAge(int age) {
+    public void setAge(String age) {
         this.age = age;
     }
 
