@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -19,7 +20,7 @@ import io.realm.RealmResults;
 import pom.realmwithrxhava.Adapter.UserAdapter;
 import pom.realmwithrxhava.Models.User;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
     @BindView(R.id.ed_name)
     EditText edName;
@@ -44,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
 
         adapter = new UserAdapter(this, null);
         lvUser.setAdapter(adapter);
+        lvUser.setOnItemClickListener(this);
     }
 
     @Override
@@ -111,6 +113,19 @@ public class MainActivity extends AppCompatActivity {
             List<User> userList = result.subList(0, result.size());
             adapter.setUserList(userList);
         }
+
+
+    }
+
+    @Override
+    public void onItemClick(final AdapterView<?> adapterView, View view, final int i, long l) {
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                User user = (User) adapterView.getItemAtPosition(i);
+                user.deleteFromRealm();
+            }
+        });
 
 
     }
