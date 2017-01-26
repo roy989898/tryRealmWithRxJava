@@ -109,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void useResultToSetTheUi(RealmResults<User> result) {
-        if (result.size() > 0) {
+        if (result.size() >= 0) {
             List<User> userList = result.subList(0, result.size());
             adapter.setUserList(userList);
         }
