@@ -3,13 +3,16 @@ package pom.realmwithrxhava;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.realm.Realm;
+import io.realm.RealmResults;
 import pom.realmwithrxhava.Models.User;
 
 public class MainActivity extends AppCompatActivity {
@@ -20,6 +23,10 @@ public class MainActivity extends AppCompatActivity {
     EditText edOld;
     @BindView(R.id.bt_save)
     Button btSave;
+    @BindView(R.id.bt_latest)
+    Button btLatest;
+    @BindView(R.id.tv_latest)
+    TextView tvLatest;
     private Realm realm;
 
     @Override
@@ -30,35 +37,57 @@ public class MainActivity extends AppCompatActivity {
         realm = Realm.getDefaultInstance();
     }
 
-    @OnClick(R.id.bt_save)
-    public void onClick() {
-        final String name = edName.getText().toString();
-        final String old = edOld.getText().toString();
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        realm.close();
+    }
 
-        Realm.Transaction transaction = new Realm.Transaction() {
-            @Override
-            public void execute(Realm bgrealm) {
-                User user = bgrealm.createObject(User.class);
-                user.setName(name);
-                user.setAge(old);
-            }
-        };
+    @OnClick({R.id.bt_save, R.id.bt_latest})
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.bt_save:
+                final String name = edName.getText().toString();
+                final String old = edOld.getText().toString();
 
-        realm.executeTransactionAsync(transaction, new Realm.Transaction.OnSuccess() {
-            @Override
-            public void onSuccess() {
-                Log.d("Realm", "success");
+                Realm.Transaction transaction = new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm bgrealm) {
 
-            }
-        }, new Realm.Transaction.OnError() {
-            @Override
-            public void onError(Throwable error) {
-                Log.d("Realm", "error");
-                error.printStackTrace();
+                        User user = new User(name, old);
+                        bgrealm.copyToRealmOrUpdate(user);
+
+                    }
+                };
+
+                realm.executeTransactionAsync(transaction, new Realm.Transaction.OnSuccess() {
+                    @Override
+                    public void onSuccess() {
+                        Log.d("Realm", "success");
+
+                    }
+                }, new Realm.Transaction.OnError() {
+                    @Override
+                    public void onError(Throwable error) {
+                        Log.d("Realm", "error");
+                        error.printStackTrace();
 
 
-            }
-        });
+                    }
+                });
+                break;
+            case R.id.bt_latest:
+                User user = getLatestUser();
+                tvLatest.setText(user.getName() + " " + user.getAge());
+
+
+                break;
+        }
+    }
+
+    private User getLatestUser() {
+        RealmResults<User> result = realm.where(User.class).findAll();
+        return result.get(result.size() - 1);
 
     }
 }
