@@ -11,13 +11,13 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="pom.realmwithrxhava.MainActivity">
 
-    <ScrollView
+    <!--<ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent">-->
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="vertical">
 
             <LinearLayout
@@ -52,18 +52,18 @@
                 android:text="Save" />
 
             <Button
-                android:text="Read Latest"
+                android:text="Read All"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/bt_latest" />
+                android:id="@+id/bt_get_all" />
 
-            <TextView
-                tools:text="Latest Show"
+            <ListView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/tv_latest" />
+                android:id="@+id/lv_user"
+                android:layout_height="match_parent" />
+
         </LinearLayout>
-    </ScrollView>
+    <!--</ScrollView>-->
 
 
 </LinearLayout>

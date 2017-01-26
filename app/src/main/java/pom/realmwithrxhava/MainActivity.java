@@ -6,7 +6,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.ListView;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -14,6 +16,7 @@ import butterknife.OnClick;
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
+import pom.realmwithrxhava.Adapter.UserAdapter;
 import pom.realmwithrxhava.Models.User;
 
 public class MainActivity extends AppCompatActivity {
@@ -24,12 +27,13 @@ public class MainActivity extends AppCompatActivity {
     EditText edOld;
     @BindView(R.id.bt_save)
     Button btSave;
-    @BindView(R.id.bt_latest)
-    Button btLatest;
-    @BindView(R.id.tv_latest)
-    TextView tvLatest;
+    @BindView(R.id.bt_get_all)
+    Button btGetAll;
+    @BindView(R.id.lv_user)
+    ListView lvUser;
     private Realm realm;
     private RealmResults<User> result;
+    private UserAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +41,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         realm = Realm.getDefaultInstance();
+
+        adapter = new UserAdapter(this, null);
+        lvUser.setAdapter(adapter);
     }
 
     @Override
@@ -45,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
         realm.close();
     }
 
-    @OnClick({R.id.bt_save, R.id.bt_latest})
+    @OnClick({R.id.bt_save, R.id.bt_get_all})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.bt_save:
@@ -78,14 +85,14 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
                 break;
-            case R.id.bt_latest:
-                getLatestUser();
+            case R.id.bt_get_all:
+                getAllUser();
 
                 break;
         }
     }
 
-    private void getLatestUser() {
+    private void getAllUser() {
         result = realm.where(User.class).findAll();
         useResultToSetTheUi(result);
 
@@ -100,7 +107,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void useResultToSetTheUi(RealmResults<User> result) {
-        User user = result.get(result.size() - 1);
-        tvLatest.setText(user.getName() + " " + user.getAge());
+        if (result.size() > 0) {
+            List<User> userList = result.subList(0, result.size());
+            adapter.setUserList(userList);
+        }
+
+
     }
 }
